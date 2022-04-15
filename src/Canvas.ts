@@ -1,5 +1,6 @@
 type CanvasParams = {
     background: string;
+    root: HTMLDivElement;
 };
 
 export class Canvas {
@@ -10,6 +11,10 @@ export class Canvas {
 
     constructor(data: CanvasParams) {
         this.background = data.background;
+
+        data.root.append(this.element);
+        this.resize();
+        this.clear();
 
         window.addEventListener('resize', this.resize);
     }
