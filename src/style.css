@@ -20,3 +20,7 @@ body {
 .container {
     padding: 0 1rem;
 }
+
+canvas {
+    outline: 1px solid white;
+}
