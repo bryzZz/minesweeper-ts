@@ -5,10 +5,12 @@ import { Render } from './Render';
 
 type ApplicationParams = {
     root: HTMLDivElement;
-    background: string;
     bombsCounter: HTMLElement;
-    rows?: number;
-    columns?: number;
+    gameSettings: {
+        rows: number;
+        columns: number;
+        cellSize: number;
+    };
 };
 
 export class Application {
@@ -22,25 +24,19 @@ export class Application {
     constructor(data: ApplicationParams) {
         this.root = data.root;
         this.bombsCounter = data.bombsCounter;
-        this.canvas = new Canvas({
-            background: data.background,
-            root: this.root,
-        });
+
+        this.canvas = new Canvas(data.root);
         this.render = new Render();
         this.mouse = new Mouse(this.canvas.element);
+
         this.field = new Field({
+            render: this.render,
             mouse: this.mouse,
-            rows: data.rows || 10,
-            columns: data.columns || 10,
-            cellSize: this.canvas.width / (data.columns || 10),
+            gameSettings: data.gameSettings,
         });
 
-        this.render.subscribe((renderData) => {
-            this.canvas.clear();
-
-            this.canvas.draw((context, canvas) => {
-                this.field.draw(context, canvas);
-            });
+        this.canvas.draw((context, canvas) => {
+            this.field.draw(context, canvas);
         });
     }
 }

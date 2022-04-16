@@ -1,3 +1,6 @@
+import { Render } from './Render';
+import { colors } from './colors';
+
 type CellParams = {
     coords: {
         y: number;
@@ -5,34 +8,49 @@ type CellParams = {
     };
     size: number;
     number: number;
-    color: string;
 };
 
 export class Cell {
-    isOpen = true;
+    isOpen = false;
     isHover = false;
     number!: number;
-    color!: string;
+
+    isMouse = false;
 
     size!: number;
     coords!: {
         y: number;
         x: number;
     };
+    sizeD!: number;
+    coordsD!: {
+        y: number;
+        x: number;
+    };
+    procent!: number;
+
+    unsubscribeFn!: false | (() => void);
 
     constructor(data: CellParams) {
         Object.assign(this, data);
+
+        this.sizeD = data.size - 10;
+        this.coordsD = {
+            y: data.coords.y + 5,
+            x: data.coords.x + 5,
+        };
+        this.procent = Math.abs(this.coords.x - this.coordsD.x) / 100;
     }
 
     draw(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
         context.beginPath();
 
-        context.rect(this.coords.x, this.coords.y, this.size, this.size);
+        context.rect(this.coordsD.x, this.coordsD.y, this.sizeD, this.sizeD);
 
-        context.fillStyle = this.color;
+        context.fillStyle = colors.cell.color.toString();
 
         if (this.isHover) {
-            context.fillStyle = 'yellow';
+            context.fillStyle = colors.cell.hover.toString();
         }
 
         context.fill();
@@ -50,4 +68,65 @@ export class Cell {
 
         context.closePath();
     }
+
+    mouseEnterHandler = (
+        context: CanvasRenderingContext2D,
+        canvas: HTMLCanvasElement,
+        render: Render
+    ) => {
+        this.isHover = true;
+
+        if (this.unsubscribeFn) {
+            this.unsubscribeFn();
+        }
+
+        this.unsubscribeFn = render.subscribe(() => {
+            if (this.coordsD.x !== this.coords.x) {
+                this.coordsD.x -= this.procent;
+                this.coordsD.y -= this.procent;
+                this.sizeD += this.procent;
+
+                this.clearCanvas(context);
+                this.draw(context, canvas);
+            } else {
+                if (this.unsubscribeFn) {
+                    this.unsubscribeFn();
+                }
+            }
+        });
+    };
+
+    mouseLeaveHandler = (
+        context: CanvasRenderingContext2D,
+        canvas: HTMLCanvasElement,
+        render: Render
+    ) => {
+        this.isHover = false;
+
+        if (this.unsubscribeFn) {
+            this.unsubscribeFn();
+        }
+
+        this.unsubscribeFn = render.subscribe(() => {
+            if (this.coordsD.x !== this.coords.x + 5) {
+                this.coordsD.x += this.procent;
+                this.coordsD.y += this.procent;
+                this.sizeD -= this.procent;
+
+                this.clearCanvas(context);
+                this.draw(context, canvas);
+            } else {
+                if (this.unsubscribeFn) {
+                    this.unsubscribeFn();
+                }
+            }
+        });
+    };
+
+    clearCanvas = (context: CanvasRenderingContext2D) => {
+        context.beginPath();
+        context.rect(this.coords.x, this.coords.y, this.size, this.size);
+        context.fillStyle = colors.background.toString();
+        context.fill();
+    };
 }

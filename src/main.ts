@@ -3,8 +3,10 @@ import './style.css';
 
 const app = new Application({
     root: document.querySelector('#field') as HTMLDivElement,
-    background: 'transparent',
     bombsCounter: document.querySelector('#bombs-counter') as HTMLElement,
-    rows: 20,
-    columns: 20,
+    gameSettings: {
+        rows: 10,
+        columns: 10,
+        cellSize: 50,
+    },
 });

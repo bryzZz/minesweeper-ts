@@ -1,18 +1,14 @@
-type CanvasParams = {
-    background: string;
-    root: HTMLDivElement;
-};
+import { colors } from './colors';
 
 export class Canvas {
     element = document.createElement('canvas');
     context = this.element.getContext('2d') as CanvasRenderingContext2D;
 
-    background!: string;
+    onResize!: Function;
 
-    constructor(data: CanvasParams) {
-        this.background = data.background;
+    constructor(root: HTMLDivElement) {
+        root.append(this.element);
 
-        data.root.append(this.element);
         this.resize();
         this.clear();
 
@@ -26,18 +22,22 @@ export class Canvas {
 
         this.element.width = this.element.parentElement.offsetWidth;
         this.element.height = this.element.parentElement.offsetHeight;
+
+        this.clear();
+        if (this.onResize) {
+            this.onResize(this.context, this.element);
+        }
     };
 
     clear = () => {
         const {
             context,
-            background,
             element: { width, height },
         } = this;
 
         context.beginPath();
         context.rect(0, 0, width, height);
-        context.fillStyle = background;
+        context.fillStyle = colors.background.toString();
         context.fill();
     };
 
@@ -47,6 +47,7 @@ export class Canvas {
             canvas: HTMLCanvasElement
         ) => void
     ) => {
+        this.onResize = callback;
         callback(this.context, this.element);
     };
 

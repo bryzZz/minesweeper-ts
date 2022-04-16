@@ -20,6 +20,7 @@ export class Mouse extends EventEmitter<MouseEvent> {
         this.element.addEventListener('mousedown', this.mouseDownHandler);
         this.element.addEventListener('mousemove', this.mouseMoveHandler);
         this.element.addEventListener('mouseup', this.mouseUpHandler);
+        this.element.addEventListener('mouseleave', this.mouseLeaveHandler);
     }
 
     mouseDownHandler = (e: MouseEvent) => {
@@ -35,7 +36,7 @@ export class Mouse extends EventEmitter<MouseEvent> {
             this.left = true;
         }
 
-        this.emit('up', e);
+        this.emit('mouseup', e);
     };
 
     mouseMoveHandler = (e: MouseEvent) => {
@@ -48,5 +49,9 @@ export class Mouse extends EventEmitter<MouseEvent> {
         Object.assign(this, { x, y });
 
         this.emit('mousemove', e);
+    };
+
+    mouseLeaveHandler = (e: MouseEvent) => {
+        this.emit('mouseleave', e);
     };
 }
