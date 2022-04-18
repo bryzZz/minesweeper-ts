@@ -2,15 +2,12 @@ import { Canvas } from './Canvas';
 import { Field } from './Field';
 import { Mouse } from './Mouse';
 import { Render } from './Render';
+import { GameSettings } from './types';
 
 type ApplicationParams = {
     root: HTMLDivElement;
     bombsCounter: HTMLElement;
-    gameSettings: {
-        rows: number;
-        columns: number;
-        cellSize: number;
-    };
+    gameSettings: GameSettings;
 };
 
 export class Application {
@@ -30,13 +27,15 @@ export class Application {
         this.mouse = new Mouse(this.canvas.element);
 
         this.field = new Field({
+            context: this.canvas.context,
+            clearCanvas: this.canvas.clear,
+            changePointer: this.canvas.changePointer,
             render: this.render,
             mouse: this.mouse,
             gameSettings: data.gameSettings,
         });
 
-        this.canvas.draw((context, canvas) => {
-            this.field.draw(context, canvas);
-        });
+        this.canvas.whatToDrawWhenResize = this.field.draw;
+        this.canvas.draw(this.field.draw);
     }
 }

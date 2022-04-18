@@ -1,16 +1,12 @@
 import { EventEmitter } from './EventEmitter';
 
-enum Button {
-    Left,
-}
-
 export class Mouse extends EventEmitter<MouseEvent> {
     element!: HTMLElement;
 
     x!: number;
     y!: number;
 
-    left = false;
+    button!: 'left' | 'right';
 
     constructor(element: HTMLElement) {
         super();
@@ -24,16 +20,20 @@ export class Mouse extends EventEmitter<MouseEvent> {
     }
 
     mouseDownHandler = (e: MouseEvent) => {
-        if (e.button === Button.Left) {
-            this.left = true;
+        if (e.button === 0) {
+            this.button = 'left';
+        } else if (e.button === 2) {
+            this.button = 'right';
         }
 
         this.emit('mousedown', e);
     };
 
     mouseUpHandler = (e: MouseEvent) => {
-        if (e.button === Button.Left) {
-            this.left = true;
+        if (e.button === 0) {
+            this.button = 'left';
+        } else if (e.button === 2) {
+            this.button = 'right';
         }
 
         this.emit('mouseup', e);

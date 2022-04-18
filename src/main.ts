@@ -8,5 +8,6 @@ const app = new Application({
         rows: 10,
         columns: 10,
         cellSize: 50,
+        minesCount: 10,
     },
 });
